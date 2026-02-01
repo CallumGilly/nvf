@@ -23,7 +23,7 @@ manner.
   # flake.nix. For the sake of the argument, we will assume that the Neovim lua
   # configuration is in a nvim/ directory relative to flake.nix.
   vim = {
-    additionalRuntimeDirectories = [
+    additionalRuntimePaths = [
       # This will be added to Neovim's runtime paths. Conceptually, this behaves
       # very similarly to ~/.config/nvim but you may not place a top-level
       # init.lua to be able to require it directly.
@@ -36,12 +36,12 @@ manner.
 This will add the `nvim` directory, or rather, the _store path_ that will be
 realised after your flake gets copied to the Nix store, to Neovim's runtime
 directory. You may now create a `lua/myconfig` directory within this nvim
-directory, and call it with [](#opt-vim.luaConfigRC).
+directory, and call it with {option}`vim.luaConfigRC`.
 
 ```nix
 {pkgs, ...}: {
   vim = {
-    additionalRuntimeDirectories = [
+    additionalRuntimePaths = [
       # You can list more than one file here.
       ./nvim-custom-1
 
@@ -90,7 +90,7 @@ vim.keymap.set("n", " ", "<Nop>", { silent = true, remap = false })
 vim.g.mapleader = " "
 ```
 
-The following Nix configuration via [](#opt-vim.luaConfigRC) will allow loading
+The following Nix configuration via {option}`vim.luaConfigRC` will allow loading
 this
 
 ```nix
@@ -105,7 +105,7 @@ this
 }
 ```
 
-[DAG system]: https://notashelf.github.io/nvf/index.xhtml#ch-using-dags
+[DAG system]: ./configuring.html#ch-using-dags
 
 After you load your custom configuration, you may use an `init.lua` located in
 your custom configuration directory to configure Neovim exactly as you would

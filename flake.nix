@@ -5,8 +5,9 @@
     self,
     ...
   } @ inputs: let
-    # call the extended library with `inputs`
-    # inputs is used to get the original standard library, and to pass inputs to the plugin autodiscovery function
+    # Call the extended library with `inputs`.
+    # inputs is used to get the original standard library, and to pass inputs
+    # to the plugin autodiscovery function
     lib = import ./lib/stdlib-extended.nix {inherit inputs self;};
   in
     flake-parts.lib.mkFlake {
@@ -28,6 +29,8 @@
           inherit (lib) nvim;
           inherit (lib.nvim) neovimConfiguration;
         };
+
+        inherit (lib.importJSON ./npins/sources.json) pins;
 
         homeManagerModules = {
           nvf = import ./flake/modules/home-manager.nix {inherit lib inputs;};
@@ -51,43 +54,93 @@
             self.nixosModules.nvf;
         };
 
-        inherit (lib.importJSON ./npins/sources.json) pins;
+        darwinModules = {
+          nvf = import ./flake/modules/nixos.nix {inherit lib inputs;};
+          default = self.darwinModules.nvf;
+        };
       };
 
       perSystem = {pkgs, ...}: {
-        # Provide the default formatter. `nix fmt` in project root
-        # will format available files with the correct formatter.
-        # P.S: Please do not format with nixfmt! It messes with many
-        # syntax elements and results in unreadable code.
-        formatter = pkgs.alejandra;
+        # Provides the default formatter for 'nix fmt', which will format the
+        # entire Nix source with Alejandra. The wrapper script is necessary due to
+        # changes to the behaviour of Nix, which now encourages wrappers for
+        # tree-wide formatting.
+        formatter = pkgs.writeShellApplication {
+          name = "nix3-fmt-wrapper";
 
-        # Check if codebase is properly formatted.
-        # This can be initiated with `nix build .#checks.<system>.nix-fmt`
-        # or with `nix flake check`
-        checks = {
-          nix-fmt = pkgs.runCommand "nix-fmt-check" {nativeBuildInputs = [pkgs.alejandra];} ''
-            alejandra --check ${self} < /dev/null | tee $out
+          runtimeInputs = [
+            pkgs.alejandra
+            pkgs.fd
+            pkgs.deno
+          ];
+
+          text = ''
+            # Find Nix files in the tree and format them with Alejandra
+            echo "Formatting Nix files"
+            fd "$@" -t f -e nix -x alejandra -q '{}'
+
+            # Same for Markdown files, but with deno
+            echo "Formatting Markdown files"
+            fd "$@" -t f -e md -x deno fmt -q '{}'
           '';
+        };
+
+        # Provides checks to be built an ran on 'nix flake check'. They can also
+        # be built individually with 'nix build' as described below.
+        checks = {
+          # Check if codebase is properly formatted.
+          # This can be initiated with `nix build .#checks.<system>.nix-fmt`
+          # or with `nix flake check`
+          nix-fmt =
+            pkgs.runCommand "nix-fmt-check"
+            {
+              src = self;
+              nativeBuildInputs = [pkgs.alejandra pkgs.fd];
+            } ''
+              cd "$src"
+              fd -t f -e nix -x alejandra --check '{}'
+              touch $out
+            '';
+
+          # Check if Markdown sources are properly formatted
+          # This can be initiated with `nix build .#checks.<system>.md-fmt`
+          # or with `nix flake check`
+          md-fmt =
+            pkgs.runCommand "md-fmt-check" {
+              src = self;
+              nativeBuildInputs = [pkgs.deno pkgs.fd];
+            } ''
+              cd "$src"
+              fd -t f -e md -x deno fmt --check '{}'
+              touch $out
+            '';
         };
       };
     };
 
-  # Flake inputs
   inputs = {
-    ## Basic Inputs
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-utils.url = "github:numtide/flake-utils";
     systems.url = "github:nix-systems/default";
+
+    ## Basic Inputs
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    flake-compat = {
+      url = "git+https://git.lix.systems/lix-project/flake-compat.git";
+      flake = false;
+    };
 
     # Alternate neovim-wrapper
     mnw.url = "github:Gerg-L/mnw";
 
-    # Language servers (use master instead of nixpkgs)
-    nil = {
-      url = "github:oxalica/nil";
+    # Alternative documentation generator
+    ndg = {
+      url = "github:feel-co/ndg?ref=refs/tags/v2.6.0";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
   };
 }

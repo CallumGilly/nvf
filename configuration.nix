@@ -15,6 +15,7 @@ isMaximal: {
 
     spellcheck = {
       enable = true;
+      programmingWordlist.enable = isMaximal;
     };
 
     lsp = {
@@ -30,6 +31,7 @@ isMaximal: {
       lspSignature.enable = !isMaximal; # conflicts with blink in maximal
       otter-nvim.enable = isMaximal;
       nvim-docs-view.enable = isMaximal;
+      harper-ls.enable = isMaximal;
     };
 
     debugger = {
@@ -42,7 +44,7 @@ isMaximal: {
     # This section does not include a comprehensive list of available language modules.
     # To list all available language module options, please visit the nvf manual.
     languages = {
-      enableFormat = true; #
+      enableFormat = true;
       enableTreesitter = true;
       enableExtraDiagnostics = true;
 
@@ -55,6 +57,7 @@ isMaximal: {
       clang.enable = isMaximal;
       css.enable = isMaximal;
       html.enable = isMaximal;
+      json.enable = isMaximal;
       sql.enable = isMaximal;
       java.enable = isMaximal;
       kotlin.enable = isMaximal;
@@ -66,8 +69,10 @@ isMaximal: {
       typst.enable = isMaximal;
       rust = {
         enable = isMaximal;
-        crates.enable = isMaximal;
+        extensions.crates-nvim.enable = isMaximal;
       };
+      toml.enable = isMaximal;
+      xml.enable = isMaximal;
 
       # Language modules that are not as common.
       assembly.enable = false;
@@ -83,11 +88,15 @@ isMaximal: {
       ocaml.enable = false;
       elixir.enable = false;
       haskell.enable = false;
+      hcl.enable = false;
       ruby.enable = false;
       fsharp.enable = false;
-
+      just.enable = false;
+      qml.enable = false;
+      jinja.enable = false;
       tailwind.enable = false;
       svelte.enable = false;
+      tera.enable = false;
 
       # Nim LSP is broken on Darwin and therefore
       # should be disabled by default. Users may still enable
@@ -153,7 +162,6 @@ isMaximal: {
     binds = {
       whichKey.enable = true;
       cheatsheet.enable = true;
-      hardtime-nvim.enable = isMaximal;
     };
 
     telescope.enable = true;
@@ -162,6 +170,7 @@ isMaximal: {
       enable = true;
       gitsigns.enable = true;
       gitsigns.codeActions.enable = false; # throws an annoying debug message
+      neogit.enable = isMaximal;
     };
 
     minimap = {
@@ -187,10 +196,14 @@ isMaximal: {
       vim-wakatime.enable = false;
       diffview-nvim.enable = true;
       yanky-nvim.enable = false;
+      qmk-nvim.enable = false; # requires hardware specific options
       icon-picker.enable = isMaximal;
       surround.enable = isMaximal;
       leetcode-nvim.enable = isMaximal;
       multicursors.enable = isMaximal;
+      smart-splits.enable = isMaximal;
+      undotree.enable = isMaximal;
+      nvim-biscuits.enable = isMaximal;
 
       motion = {
         hop.enable = true;
@@ -204,7 +217,6 @@ isMaximal: {
     };
 
     notes = {
-      obsidian.enable = false; # FIXME: neovim fails to build if obsidian is enabled
       neorg.enable = false;
       orgmode.enable = false;
       mind-nvim.enable = isMaximal;
@@ -248,6 +260,7 @@ isMaximal: {
         cmp.enable = isMaximal;
       };
       codecompanion-nvim.enable = false;
+      avante-nvim.enable = isMaximal;
     };
 
     session = {

@@ -1,4 +1,4 @@
-# Standalone Installation on NixOS {#ch-standalone-nixos}
+## Standalone Installation on NixOS {#ch-standalone-nixos}
 
 Your built Neovim configuration can be exposed as a flake output to make it
 easier to share across machines, repositories and so on. Or it can be added to
@@ -49,7 +49,8 @@ the default theme enabled. You may use other options inside `config.vim` in
         # ...
         modules = [
           # This will make wrapped neovim available in your system packages
-          # Can also move this to another config file if you pass inputs/self around with specialArgs
+          # Can also move this to another config file if you pass your own
+          # inputs/self around with specialArgs
           ({pkgs, ...}: {
             environment.systemPackages = [self.packages.${pkgs.stdenv.system}.neovim];
           })
@@ -58,4 +59,5 @@ the default theme enabled. You may use other options inside `config.vim` in
       };
     };
   };
-}```
+}
+```

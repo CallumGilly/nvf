@@ -15,15 +15,19 @@
     ./multicursors
     ./new-file-template
     ./nix-develop
+    ./nvim-biscuits
     ./oil-nvim
     ./outline
     ./preview
+    ./qmk-nvim
     ./sleuth
+    ./smart-splits
     ./snacks-nvim
     ./surround
     ./telescope
     ./wakatime
     ./yanky-nvim
     ./yazi-nvim
+    ./undotree
   ];
 }

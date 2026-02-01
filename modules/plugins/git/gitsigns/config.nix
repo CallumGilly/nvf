@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  options,
   ...
 }: let
   inherit (builtins) toJSON;
@@ -12,8 +13,7 @@
 
   cfg = config.vim.git.gitsigns;
 
-  self = import ./gitsigns.nix {inherit lib config;};
-  gsMappingDefinitions = self.options.vim.git.gitsigns.mappings;
+  gsMappingDefinitions = options.vim.git.gitsigns.mappings;
 
   gsMappings = addDescriptionsToMappings cfg.mappings gsMappingDefinitions;
 in {
@@ -69,7 +69,7 @@ in {
         };
 
         binds.whichKey.register = pushDownDefault {
-          "<leader>g" = "+Gitsigns";
+          "<leader>h" = "+Gitsigns";
         };
 
         pluginRC.gitsigns = entryAnywhere ''
