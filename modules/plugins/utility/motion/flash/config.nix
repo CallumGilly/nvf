@@ -5,8 +5,6 @@
 }: let
   inherit (lib.modules) mkIf;
   inherit (lib.nvim.binds) mkKeymap;
-  inherit (lib.nvim.lua) toLuaObject;
-  inherit (lib.nvim.dag) entryAnywhere;
 
   cfg = config.vim.utility.motion.flash-nvim;
 in {
@@ -16,7 +14,7 @@ in {
         "flash-nvim" = {
           package = "flash-nvim";
           setupModule = "flash";
-          setupOpts = cfg.setupOpts;
+          inherit (cfg) setupOpts;
 
           lazy = true;
 

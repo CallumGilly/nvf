@@ -5,8 +5,8 @@
   ...
 }: let
   inherit (lib.modules) mkIf;
-  inherit (lib.strings) optionalString;
-  inherit (lib.lists) optionals;
+  inherit (lib.strings) optionalString concatMapStringsSep;
+  inherit (lib.lists) optionals concatLists;
   inherit (lib.nvim.binds) pushDownDefault mkKeymap;
 
   cfg = config.vim.telescope;
@@ -16,7 +16,7 @@
 in {
   config = mkIf cfg.enable {
     vim = {
-      startPlugins = ["plenary-nvim"];
+      startPlugins = ["plenary-nvim"] ++ concatLists (map (x: x.packages) cfg.extensions);
 
       lazy.plugins.telescope = {
         package = "telescope";
@@ -28,11 +28,14 @@ in {
           vim.g.loaded_telescope = nil
         '';
 
-        after = ''
+        after = let
+          enabledExtensions = map (x: x.name) cfg.extensions;
+        in ''
           local telescope = require("telescope")
           ${optionalString config.vim.ui.noice.enable "telescope.load_extension('noice')"}
           ${optionalString config.vim.notify.nvim-notify.enable "telescope.load_extension('notify')"}
           ${optionalString config.vim.projects.project-nvim.enable "telescope.load_extension('projects')"}
+          ${concatMapStringsSep "\n" (x: "telescope.load_extension('${x}')") enabledExtensions}
         '';
 
         cmd = ["Telescope"];
@@ -46,6 +49,7 @@ in {
             (mkKeymap "n" keys.open "<cmd>Telescope<CR>" {desc = mappings.open.description;})
             (mkKeymap "n" keys.resume "<cmd>Telescope resume<CR>" {desc = mappings.resume.description;})
 
+            (mkKeymap "n" keys.gitFiles "<cmd>Telescope git_files<CR>" {desc = mappings.gitFiles.description;})
             (mkKeymap "n" keys.gitCommits "<cmd>Telescope git_commits<CR>" {desc = mappings.gitCommits.description;})
             (mkKeymap "n" keys.gitBufferCommits "<cmd>Telescope git_bcommits<CR>" {desc = mappings.gitBufferCommits.description;})
             (mkKeymap "n" keys.gitBranches "<cmd>Telescope git_branches<CR>" {desc = mappings.gitBranches.description;})
